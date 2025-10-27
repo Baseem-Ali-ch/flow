@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "http-proxy-middleware": "^3.0.5"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.4",
+    "express": "^5.1.0"
+  }
+}

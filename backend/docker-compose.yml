@@ -1,0 +1,34 @@
+version: "3.8"
+
+services:
+  # API Gateway
+  api-gateway:
+    build: ./api-gateway
+    container_name: api-gateway
+    ports:
+      - "4000:4000"
+    env_file:
+      - ./api-gateway/.env
+    depends_on:
+      - auth-service
+      - user-service
+      - hr-service
+      - inventory-service
+      - finance-service
+    networks:
+      - microservices-net
+
+  # Auth Service
+  auth-service:
+    build: ./auth-service
+    container_name: auth-service
+    ports:
+      - "5001:5001"
+    env_file:
+      - ./auth-service/.env
+    networks:
+      - microservices-net
+
+networks:
+  microservices-net:
+    driver: bridge
