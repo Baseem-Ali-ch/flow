@@ -1,12 +1,15 @@
-# syntax=docker/dockerfile:1
 FROM node:20-alpine
 
 WORKDIR /app
 
-COPY package*.json ./
+COPY api-gateway/package*.json ./api-gateway/
+COPY shared ./shared/
+
+WORKDIR /app/api-gateway
 RUN npm install --production
 
-COPY . .
+COPY api-gateway ./api-gateway
+COPY shared ./shared
 
 EXPOSE 4000
 

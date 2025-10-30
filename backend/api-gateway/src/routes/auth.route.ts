@@ -1,11 +1,9 @@
 import { Router } from "express";
 import { proxyHelper } from "../utils/proxyHelper";
-import {config} from '../config/env'
+import { config } from "../config/env";
 
-const router = Router()
+const router = Router();
 
-router.use('/', (req, res) => {
-    proxyHelper(req, res, config.authServiceUrl)
-})
+router.use("/", (req, res) => proxyHelper(req, res, config.authServiceUrl));
 
-export default router
+export default router;

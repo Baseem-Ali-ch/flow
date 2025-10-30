@@ -1,9 +1,26 @@
 {
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "concurrently \"npm run dev --prefix api-gateway\" \"npm run dev --prefix services/auth-service\""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
   "dependencies": {
-    "http-proxy-middleware": "^3.0.5"
+    "@types/mongoose": "^5.11.96",
+    "@types/nodemon": "^1.19.6",
+    "dotenv": "^17.2.3",
+    "mongoose": "^8.19.2",
+    "nodemon": "^3.1.10",
+    "winston": "^3.18.3"
   },
   "devDependencies": {
     "@types/express": "^5.0.4",
+    "concurrently": "^9.2.1",
     "express": "^5.1.0"
   }
 }

@@ -3,7 +3,9 @@ version: "3.8"
 services:
   # API Gateway
   api-gateway:
-    build: ./api-gateway
+    build:
+      context: .
+      dockerfile: ./api-gateway/Dockerfile
     container_name: api-gateway
     ports:
       - "4000:4000"
@@ -11,21 +13,19 @@ services:
       - ./api-gateway/.env
     depends_on:
       - auth-service
-      - user-service
-      - hr-service
-      - inventory-service
-      - finance-service
     networks:
       - microservices-net
 
   # Auth Service
   auth-service:
-    build: ./auth-service
+    build:
+      context: .
+      dockerfile: ./services/auth-service/Dockerfile
     container_name: auth-service
     ports:
       - "5001:5001"
     env_file:
-      - ./auth-service/.env
+      - ./services/auth-service/.env
     networks:
       - microservices-net
 
