@@ -1,6 +1,6 @@
 import {config} from './config/env'
 import app from './app'
-import connectDB from '../../../shared/config/db'
+import {connectDB} from '../../../shared/config/db'
 
 connectDB()
 
