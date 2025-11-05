@@ -14,9 +14,9 @@ import {
   EmailVerificationPayload,
 } from "../utils/token";
 import { AppError } from "../../../../shared/utils/AppError";
-import { config } from "src/config/env";
-import { sendVerificationEmail } from "src/utils/sendEmail";
+import { sendVerificationEmail } from "../utils/sendEmail";
 import jwt from "jsonwebtoken";
+import { config } from "../config/env";
 
 export const loginService = async (email: string, password: string) => {
   const user = await findByEmail(email);

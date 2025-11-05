@@ -59,7 +59,7 @@ export function registerValidation(
       errors.push("Username is required");
     } else {
       if (!userNameRegex.test(username)) {
-        errors.push("Username should be at least 4 characters");
+        errors.push("Username must be at least 4 characters");
       }
     }
 

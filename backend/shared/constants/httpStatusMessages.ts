@@ -1,5 +1,5 @@
 export const StatusMessages = {
-  OK: "OK",
+  OK: "Ok",
   CREATED: "Created",
   ACCEPTED: "Accepted",
   NO_CONTENT: "No Content",

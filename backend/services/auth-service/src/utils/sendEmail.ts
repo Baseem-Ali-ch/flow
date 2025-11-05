@@ -1,4 +1,4 @@
-import { transporter } from "src/config/mail";
+import { transporter } from "../config/mail";
 
 export const sendVerificationEmail = async (to: string, emailVerifyUrl: string) => {
   await transporter.sendMail({

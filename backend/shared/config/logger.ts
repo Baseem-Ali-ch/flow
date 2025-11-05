@@ -5,10 +5,14 @@ const logger = createLogger({
   format: format.combine(
     format.timestamp(),
     format.errors({ stack: true }),
-    format.printf(({ timestamp, level, message, stack }) => {
-      return stack
-        ? `${timestamp} [${level}]: ${message} - ${stack}`
-        : `${timestamp} [${level}]: ${message}`;
+    format.printf(({ timestamp, level, message, stack, error }) => {
+      if (stack) {
+        return `${timestamp} [${level}]: ${message} - ${stack}`;
+      }
+      if (error) {
+        return `${timestamp} [${level}]: ${message} - ${error}`;
+      }
+      return `${timestamp} [${level}]: ${message}`;
     })
   ),
   transports: [new transports.Console()],
