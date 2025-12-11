@@ -9,7 +9,7 @@ export const findByUsername = async (
   try {
     return await User.findOne({ username });
   } catch (error) {
-    logger.error("[Repository] Username find ", error);
+    logger.error("[Repository] Find by Username ", error);
     return null;
   }
 };
@@ -18,7 +18,7 @@ export const findByEmail = async (email: string): Promise<IUser | null> => {
   try {
     return await User.findOne({ email });
   } catch (error) {
-    logger.error("[Repository] Email find ", error);
+    logger.error("[Repository] Find by Email ", error);
     return null;
   }
 };
@@ -27,7 +27,7 @@ export const findById = async (id: string | JwtPayload): Promise<IUser | null> =
   try {
     return await User.findOne({ _id: id });
   } catch (error) {
-    logger.error("[Repository] Id find ", error);
+    logger.error("[Repository] Find by Id ", error);
     return null;
   }
 };
@@ -46,7 +46,7 @@ export const createUser = async (
       password: hashedPassword,
     });
   } catch (error) {
-    logger.error("[Repository] Register ", error);
+    logger.error("[Repository] Create User ", error);
     return null;
   }
 };
@@ -55,10 +55,10 @@ export const updateUser = async (id: string) => {
   try {
     return await User.updateOne(
       { _id: id },
-      { $set: { isEmailVerified: true } }
+      { $set: { isVerified: true } }
     );
   } catch (error) {
-    logger.error("[Repository] Update ", error);
+    logger.error("[Repository] Update User ", error);
     return null;
   }
 };

@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "concurrently \"npm run dev --prefix api-gateway\" \"npm run dev --prefix services/auth-service\""
+    "dev": "concurrently \"npm run dev --prefix api-gateway\" \"npm run dev --prefix services/auth-service\" \"npm run dev --prefix services/user-service\" "
   },
   "keywords": [],
   "author": "",

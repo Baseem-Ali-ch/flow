@@ -12,6 +12,8 @@
   let isEmailTouched: boolean = $state(false);
   let isPasswordTouched: boolean = $state(false);
 
+  let showPassword: boolean = $state(false);
+
   function validateEmail() {
     if (!email.trim()) {
       emailError = "Email is required";
@@ -28,38 +30,42 @@
     }
   }
 
-  function handleEmailBlur() {
-    isEmailTouched = true;
-    validateEmail();
-  }
+  const isFormValid = $derived(
+    !emailError && !passwordError && isEmailTouched && isPasswordTouched
+  );
 
-  function handlePasswordBlur() {
-    isPasswordTouched = true;
-    validatePassword();
-  }
-
-  const isFormValid = $derived(!emailError && !passwordError && email.trim() && password.trim())
+  const togglePassword = async () => {
+    showPassword = !showPassword;
+  };
 
   const handleSubmit = async (event: Event) => {
-    event.preventDefault()
-    validateEmail()
-    validatePassword()
-    if(!isFormValid) return
+    event.preventDefault();
+    validateEmail();
+    validatePassword();
+    if (!isFormValid) return;
 
     try {
       loading = true;
       await new Promise((resolve) => setTimeout(resolve, 1000));
       const result = await loginApi(email, password);
-      if (result.Ok) {
-        localStorage.setItem("access_token", result.accessToken);
-        localStorage.setItem("refresh_token", result.refreshToken);
-        goto("/profile");
+      if (result.message == "Ok") {
+        localStorage.setItem("access_token", result.data.accessToken);
+        localStorage.setItem("refresh_token", result.data.refreshToken);
+        localStorage.setItem("role", result.data.user.role);
+
+        if (result.data.user.role == "admin") {
+          goto("/admin/dashboard");
+        } else {
+          goto("/user/profile");
+        }
       } else {
-        apiError = "Login failed. Please try again.";
+        apiError =
+          (!result.success && result.message) ||
+          "Login failed. Please try again.";
       }
     } catch (error) {
       loading = false;
-      console.log("Failed login "), error;
+      console.log("Failed login ", error);
     } finally {
       loading = false;
     }
@@ -67,159 +73,194 @@
 </script>
 
 <div class="container">
-  <form class="login" onsubmit={handleSubmit}>
-    <div class="header">
-      <h2>Welcome Back!</h2>
-      <p>Please log in to continue</p>
-    </div>
+  <div class="left-section">
+    <img src="/login-banner.svg" alt="Login Illustration" />
+  </div>
 
-    <div class="form-group">
-      <input
-        type="text"
-        placeholder="Email"
-        bind:value={email}
-        oninput={validateEmail}
-        onblur={handleEmailBlur}
-      />
-      {#if isEmailTouched && emailError}
-        <p style="color: red;">{emailError}</p>
-      {/if}
-    </div>
+  <div class="right-section">
+    <h2>Welcome Back!</h2>
+    <p class="subtitle">Please log in to continue</p>
 
-    <div class="form-group">
-      <input
-        type="password"
-        placeholder="Password"
-        bind:value={password}
-        oninput={validatePassword}
-        onblur={handlePasswordBlur}
-      />
-      {#if isPasswordTouched && passwordError}
-        <p style="color: red;">{passwordError}</p>
-      {/if}
-    </div>
-    <a href="/forgot-password" class="forgot-link">Forgot your password?</a>
+    <form onsubmit={handleSubmit}>
+      <!-- Email -->
+      <div class="input-group">
+        <div class="input-wrapper">
+          <img src="/icons/mail.svg" class="icon" alt="email" />
+          <input
+            type="email"
+            placeholder="john.doe@example.com"
+            bind:value={email}
+            oninput={validateEmail}
+            onblur={() => {
+              isEmailTouched = true;
+              validateEmail();
+            }}
+          />
+        </div>
+        {#if isEmailTouched && emailError}
+          <p class="error">{emailError}</p>
+        {/if}
+      </div>
 
-    <button type="submit" class="submit-btn" disabled={!isFormValid || loading}>
-      {#if loading}
-        <Loader />
-      {:else}
-        Log In
-      {/if}
-    </button>
-    <div class="divider">
-      <span>or</span>
-    </div>
+      <!-- Password -->
+      <div class="input-group password-field">
+        <div class="input-wrapper">
+          <img src="/icons/lock-keyhole.svg" class="icon" alt="password" />
+          <input
+            type={showPassword ? "text" : "password"}
+            placeholder="Password"
+            id="password"
+            bind:value={password}
+            oninput={validatePassword}
+            onblur={() => {
+              isPasswordTouched = true;
+              validatePassword();
+            }}
+          />
+          <button
+            class="toggle-password-btn"
+            type="button"
+            onclick={togglePassword}
+          >
+            <img
+              src={showPassword ? "/icons/eye.svg" : "/icons/eye-off.svg"}
+              class="toggle-eye"
+              id="togglePassword"
+              alt="toggle password"
+            />
+          </button>
+        </div>
+        {#if isPasswordTouched && passwordError}
+          <p class="error">{passwordError}</p>
+        {/if}
+        {#if apiError}
+          <p class="error">{apiError}</p>
+        {/if}
+      </div>
 
-    <div class="links">
-      <p>Don't have an account? <a href="/register">Sign up</a></p>
-    </div>
-  </form>
+      <!-- Submit -->
+      <button
+        type="submit"
+        class="submit-btn"
+        disabled={!isFormValid || loading}>Login</button
+      >
+
+      <p class="footer-text">
+        Already have an account? <a href="/auth/register">Sign Up</a>
+      </p>
+    </form>
+  </div>
 </div>
 
 <style>
   .container {
-    min-height: 100vh;
+    background: #e8e9ef;
+    padding: 3.5em;
+    display: flex;
+  }
+
+  .left-section {
+    background: linear-gradient(135deg, #c3cfe2 0%, #f5f7fa 100%);
+    padding: 60px 40px;
+    flex: 1;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 20px;
-    background: var(--background-color);
+    border-radius: 5px 0 0 5px;
   }
 
-  .login {
+  .left-section img {
+    width: 86%;
+  }
+
+  .right-section {
+    padding: 50px 45px;
+    flex: 1;
+    background: white;
+    border-radius: 0 5px 5px 0;
+  }
+
+  h2 {
+    font-size: 24px;
+    color: #2d3748;
+    margin-bottom: 8px;
+    font-weight: 600;
+  }
+
+  .subtitle {
+    color: #a0aec0;
+    font-size: 13px;
+    margin-bottom: 30px;
+  }
+
+  .input-group {
+    position: relative;
+    margin-bottom: 18px;
+  }
+
+  .icon {
+    position: absolute;
+    top: 50%;
+    left: 12px;
+    transform: translateY(-50%);
+    width: 18px;
+    opacity: 0.7;
+  }
+
+  .toggle-password-btn {
+    position: absolute;
+    background: none;
+    border: none;
+    right: 14px;
+    top: 50%;
+  }
+
+  .toggle-eye {
+    transform: translateY(-50%);
+    width: 20px;
+    cursor: pointer;
+    opacity: 0.7;
+  }
+
+  input {
     width: 100%;
-    max-width: 420px;
-    padding: 48px 40px;
-    border-radius: 16px;
-    background: var(--card-color);
-    animation: slideUp 0.5s ease-out;
+    padding: 1em 0;
+    border: 1px solid #e2e8f0;
+    border-radius: 5px;
+    font-size: 1em;
+    transition: all 0.3s;
+    background: #f7fafc;
+    text-indent: 3em;
   }
 
-  @keyframes slideUp {
-    from {
-      opacity: 0;
-      transform: translateY(30px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  .header {
-    text-align: center;
-    margin-bottom: 32px;
-  }
-
-  .login h2 {
-    margin: 0 0 8px;
-    font-size: 32px;
-    font-weight: 700;
-  }
-
-  .login p {
-    margin: 0;
-    font-size: 15px;
-    color: var(--secondary-font-color);
-  }
-
-  .form-group {
-    margin-bottom: 20px;
-  }
-
-  .login input {
-    width: 100%;
-    display: block;
-    box-sizing: border-box;
-    padding: 14px 16px;
-    font-size: 15px;
-    border-radius: 10px;
-    border: 1px solid var(--border-color);
-    background-color: #181f25;
-    transition: all 0.3s ease;
-    font-family: inherit;
-    color: var(--primary-font-color);
-  }
-
-  .login input:focus {
+  .input-group input:focus {
     outline: none;
+    border-color: #d4a76a;
+    background: white;
   }
 
-  .login input::placeholder {
-    color: var(--secondary-font-color);
-  }
-
-  .forgot-link {
-    display: inline-block;
-    margin-bottom: 24px;
-    font-size: 14px;
-    color: var(--accent-one);
-    text-decoration: none;
-    transition: color 0.2s;
-    
-  }
-
-  .forgot-link:hover {
-    color: #764ba2;
-    text-decoration: underline;
+  .input-wrapper {
+    position: relative;
+    margin-bottom: 3px;
   }
 
   .submit-btn {
     width: 100%;
     padding: 14px;
+    background: #1c4c69;
+    color: white;
     border: none;
     border-radius: 5px;
-    background: var(--accent-one);
-    color: white;
-    font-size: 16px;
+    font-size: 15px;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.3s;
+    box-shadow: 0 4px 15px rgba(212, 167, 106, 0.3);
   }
 
   .submit-btn:hover {
     transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(212, 167, 106, 0.4);
   }
 
   .submit-btn:disabled {
@@ -228,79 +269,21 @@
     transform: none;
   }
 
-  .divider {
-    position: relative;
+  .footer-text {
     text-align: center;
-    margin: 28px 0;
+    margin-top: 20px;
+    font-size: 13px;
+    color: #718096;
   }
 
-  .divider::before {
-    content: "";
-    position: absolute;
-    left: 0;
-    top: 50%;
-    width: 100%;
-    height: 1px;
-    background: var(--border-color);
-  }
-
-  .divider span {
-    position: relative;
-    display: inline-block;
-    padding: 0 16px;
-    background: var(--card-color);
-    color: #a0aec0;
-    font-size: 14px;
-  }
-
-  .links {
-    text-align: center;
-  }
-
-  .links p {
-    margin: 0;
-    font-size: 14px;
-  }
-
-  .links a {
-    color: var(--accent-one);
-    text-decoration: none;
-    font-weight: 600;
-    transition: color 0.2s;
-  }
-
-  .links a:hover {
-    color: #764ba2;
-    text-decoration: underline;
-  }
-
-  @media (max-width: 480px) {
+  @media (max-width: 768px) {
     .container {
-      padding: 16px;
+      flex-direction: column;
+      padding: 20px;
     }
 
-    .login {
-      padding: 36px 24px;
-    }
-
-    .login h2 {
-      font-size: 28px;
-    }
-
-    .login input,
-    .submit-btn {
-      padding: 12px 14px;
-      font-size: 14px;
-    }
-  }
-
-  @media (max-width: 360px) {
-    .login {
-      padding: 28px 20px;
-    }
-
-    .login h2 {
-      font-size: 24px;
+    .left-section {
+      padding: 40px;
     }
   }
 </style>

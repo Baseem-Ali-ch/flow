@@ -4,14 +4,18 @@
 }
 
 :root {
-    --background-color:  #191F25;
-    --primary-font-color: #F8FAFC;
-    --secondary-font-color:#7C8FA2;
-    --border-color: #262F39;
-    --card-color: #1F262E;
-    --primary-button-color: #03A5A6;
-
-    --accent-one: #667eea;
+    --background-color:  #FFFFFF;
+    --secondary-bg-color: #F7F9FB;
+    --primary-font-color: #2d3748;
+    --secondary-font-color:#a0aec0;
+    --border-color: #e2e8f0;
+    --card-color: #e8e9ef;
+    --primary-button-color: #1c4c69;
+    --input-color: #f7fafc;
+    --accent-one: #ffff;
+    --accent-two: #d4a76a;
+    --accent-three: #718096;
+    --accent-four: #667eea;
 
 }
 
@@ -19,4 +23,20 @@ body{
     background-color: var(--background-color);
     color: var(--primary-font-color);
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    font-size: 1em;
+}
+
+a {
+    color: var(--accent-two);
+    text-decoration: underline;
+    font-weight: 600;
+
+}
+
+a:hover{
+    color: rgba(181, 144, 91, 0.882)
+}
+
+.error{
+    color: red;
 }

@@ -3,5 +3,6 @@ dotenv.config()
 
 export const config = {
     port: process.env.PORT!,
-    authServiceUrl: process.env.AUTH_SERVICE_URL!
+    authServiceUrl: process.env.AUTH_SERVICE_URL!,
+    userServiceUrl: process.env.USER_SERVICE_URL!
 }

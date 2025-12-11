@@ -20,7 +20,6 @@ import { config } from "../config/env";
 
 export const loginService = async (email: string, password: string) => {
   const user = await findByEmail(email);
-
   if (!user) {
     throw new AppError("Invalid Credentials", StatusCodes.BAD_REQUEST);
   }
@@ -30,8 +29,17 @@ export const loginService = async (email: string, password: string) => {
     throw new AppError("Invalid Credentials", StatusCodes.BAD_REQUEST);
   }
 
-  const accessToken = await _accessToken(user);
-  const refreshToken = await _refreshToken(user);
+  if (!user.isActive) {
+    throw new AppError("Your account is not approved/blocked. Please contact administrator or manager", StatusCodes.BAD_REQUEST);
+  }
+
+  const payload = {
+    id: user._id!.toString(),
+    email: user.email,
+    role: user.role,
+  };
+  const accessToken = await _accessToken(payload);
+  const refreshToken = await _refreshToken(payload);
 
   return { user, accessToken, refreshToken };
 };
@@ -68,25 +76,28 @@ export const registerService = async (
 };
 
 export const verifyEmailService = async (token: string) => {
-  const decoded = jwt.verify(token, config.jwtSecret) as EmailVerificationPayload;
+  const decoded = jwt.verify(
+    token,
+    config.jwtSecret
+  ) as EmailVerificationPayload;
 
   const user = await findById(decoded.id);
   if (!user) {
     throw new AppError("Not found", StatusCodes.NOT_FOUND);
   }
-  if (user.isEmailVerified) {
+  if (user.isVerified) {
     throw new AppError("Email already verified", StatusCodes.BAD_REQUEST);
   }
 
   const result = await updateUser(user._id!);
 
-  const payload = {
-    id: user._id!.toString(),
-    email: user.email,
-    role: user.role,
-  };
-  const accessToken = await _accessToken(payload);
-  const refreshToken = await _refreshToken(payload);
+  // const payload = {
+  //   id: user._id!.toString(),
+  //   email: user.email,
+  //   role: user.role,
+  // };
+  // const accessToken = await _accessToken(payload);
+  // const refreshToken = await _refreshToken(payload);
 
-  return { result, accessToken, refreshToken };
+  return { result };
 };
